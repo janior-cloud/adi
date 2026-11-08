@@ -42,13 +42,16 @@ needs a Developer ID and notarisation, which this does not pretend to do.
   "provider": "http:http://127.0.0.1:8080/v1/chat/completions",
   "model": "your-model-name",
   "envFile": "~/.adi/runtime.env",
+  "apiKeyEnv": "ADI_LOCAL_KEY",
   "speak": true,
   "voice": "Tingting"
 }
 ```
 
 `envFile` is a `KEY=VALUE` file (`chmod 600`) merged into the runtime's
-environment. Credentials belong there, not in `config.json` — a config file gets
+environment; `apiKeyEnv` names the variable inside it that holds the credential,
+which is re-exported as `ADI_LOCAL_KEY` for the runtime — never on the command
+line, because `ps` shows argv to every user on the machine. Credentials belong there, not in `config.json` — a config file gets
 pasted into bug reports, and `env` objects get screenshotted.
 
 ```bash

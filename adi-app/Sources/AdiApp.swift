@@ -162,6 +162,12 @@ final class Runtime {
             for (k, v) in fromFile { env[k] = v }
             Log.w("env file \(cfg.envFile): \(fromFile.count) key(s)")
         }
+        // Re-name the credential instead of passing it on the command line:
+        // `ps` is world-readable on macOS, argv is not a place for a secret.
+        if !cfg.apiKeyEnv.isEmpty, let key = env[cfg.apiKeyEnv], !key.isEmpty {
+            env["ADI_LOCAL_KEY"] = key
+            Log.w("api key: taken from \(cfg.apiKeyEnv)")
+        }
         p.environment = env
         let pipe = Pipe()
         p.standardOutput = pipe
