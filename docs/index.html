@@ -83,12 +83,15 @@
 
   <h2>Run it</h2>
   <div class="card">
-<pre><span class="c"># the runtime listens on localhost; anything that can POST JSON can drive it</span>
+<pre><span class="c"># 1. the runtime: localhost HTTP + SSE, stdlib only</span>
+<span class="k">cd</span> adi-runtime &amp;&amp; <span class="k">python3</span> -m adi_runtime --port 8899
+
+<span class="c"># 2. anything that can POST JSON can drive it</span>
 <span class="k">pip install</span> adi-sdk
 
 <span class="k">from</span> adi_sdk <span class="k">import</span> ADI
 
-adi = ADI()
+adi = ADI(<span style="color:#9ad1a8">"http://127.0.0.1:8899"</span>)
 <span class="k">for</span> chunk <span class="k">in</span> adi.chat(<span style="color:#9ad1a8">"what changed on this machine today?"</span>):
     print(chunk, end=<span style="color:#9ad1a8">""</span>, flush=True)
 

@@ -1,16 +1,16 @@
-"""ADI SDK — 与本地 ADI 运行时对话的最小客户端。
+"""ADI SDK - a minimal client for a local ADI runtime.
 
-只依赖标准库。运行时默认监听 http://127.0.0.1:8791。
+Standard library only. The runtime listens on http://127.0.0.1:8899 by default.
 
     from adi_sdk import ADI
 
-    adi = ADI()                       # 或 ADI("http://127.0.0.1:8791")
-    for chunk in adi.chat("帮我看看今天的备份"):
-        print(chunk, end="", flush=True)   # 流式
-    adi.say("备份跑完了")              # 让它用原声念一句
-    if line := adi.proactive():        # 它想主动说的话（通常返回 None）
+    adi = ADI()                        # or ADI("http://127.0.0.1:8899")
+    for chunk in adi.chat("what changed today?"):
+        print(chunk, end="", flush=True)     # streaming
+    adi.say("backup finished")               # have it speak a line locally
+    if line := adi.proactive():              # usually None - by design
         print(line)
-    print(adi.state()["memory"])       # 真实状态数字
+    print(adi.state()["memory"])             # real numbers, not estimates
 """
 from __future__ import annotations
 
@@ -22,13 +22,18 @@ from typing import Iterator
 __all__ = ["ADI", "ADIError"]
 __version__ = "0.1.0"
 
+# A localhost runtime must never be routed through the machine's HTTP proxy:
+# a VPN or proxy app in a bad state then turns every local call into a 503,
+# which looks exactly like "the runtime is down".
+_OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
 
 class ADIError(RuntimeError):
-    """运行时不可达，或返回了错误事件。"""
+    """The runtime is unreachable, or it returned an error event."""
 
 
 class ADI:
-    def __init__(self, base: str = "http://127.0.0.1:8791", timeout: float = 180.0):
+    def __init__(self, base: str = "http://127.0.0.1:8899", timeout: float = 180.0):
         self.base = base.rstrip("/")
         self.timeout = timeout
 
@@ -40,17 +45,17 @@ class ADI:
             f"{self.base}{path}", data=body,
             headers={"Content-Type": "application/json"}, method="POST")
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            with _OPENER.open(req, timeout=self.timeout) as resp:
                 return json.loads(resp.read() or b"{}")
         except urllib.error.URLError as exc:
-            raise ADIError(f"{path} 不可达: {exc}") from exc
+            raise ADIError(f"{path} unreachable: {exc}") from exc
 
     def _get(self, path: str) -> dict:
         try:
-            with urllib.request.urlopen(f"{self.base}{path}", timeout=self.timeout) as resp:
+            with _OPENER.open(f"{self.base}{path}", timeout=self.timeout) as resp:
                 return json.loads(resp.read() or b"{}")
         except urllib.error.URLError as exc:
-            raise ADIError(f"{path} 不可达: {exc}") from exc
+            raise ADIError(f"{path} unreachable: {exc}") from exc
 
     # ---- 能力 ----
 
@@ -68,19 +73,26 @@ class ADI:
             f"{self.base}/api/chat", data=body,
             headers={"Content-Type": "application/json"}, method="POST")
         try:
-            resp = urllib.request.urlopen(req, timeout=self.timeout)
+            resp = _OPENER.open(req, timeout=self.timeout)
         except urllib.error.URLError as exc:
-            raise ADIError(f"/api/chat 不可达: {exc}") from exc
+            raise ADIError(f"/api/chat unreachable: {exc}") from exc
         streamed = False
+        kind = ""
         with resp:
             for raw in resp:
                 line = raw.decode("utf-8", "replace").strip()
+                if line.startswith("event:"):
+                    kind = line[6:].strip()
+                    continue
                 if not line.startswith("data:"):
                     continue
                 try:
                     event = json.loads(line[5:].strip())
                 except json.JSONDecodeError:
                     continue
+                # Standard SSE carries the type on the `event:` line; some
+                # servers also repeat it inside the JSON. Accept both.
+                event.setdefault("event", kind)
                 if event.get("event") == "delta":
                     text = event.get("text") or event.get("delta") or ""
                     if text:

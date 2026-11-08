@@ -61,9 +61,9 @@ a desktop shell, a phone app, a cron job, another agent.
 | Part | State |
 |---|---|
 | `adi-sdk` | client for `/chat`, `/say`, `/proactive`, `/state` — working |
-| `adi-runtime` | fallback chains + say queue + proactive gate — working skeleton |
+| `adi-runtime` | HTTP + SSE, fallback chain, speech queue, proactive gate — working, 17 tests passing |
 | `adi-app` | macOS app that supervises the runtime — working, ad-hoc signed |
-| `docs` | not published yet |
+| `docs` | live at https://janior-cloud.github.io/adi/ |
 
 Measured on a 2021 MacBook Pro, macOS 27, local models only:
 
