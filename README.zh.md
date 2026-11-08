@@ -28,7 +28,7 @@ ADI 反着建：**每一层都有本地退路，拔掉任何一层，系统仍�
 adi-app      macOS 外壳（AppKit + WKWebView）      AGPL-3.0
 adi-runtime  编排、退路链、通道、主动开口闸门      AGPL-3.0
 adi-sdk      Python / TypeScript 客户端            Apache-2.0
-adi-docs     文档站点（GitHub Pages）              CC BY 4.0
+docs     文档站点（GitHub Pages）              CC BY 4.0
 ```
 
 运行时在本机用普通 HTTP + SSE，任何能发 JSON 的东西都能驱动它：桌面外壳、手机 App、
@@ -47,7 +47,7 @@ adi-docs     文档站点（GitHub Pages）              CC BY 4.0
 |---|---|---|
 | `adi-sdk/` | Apache-2.0 | 允许商用 |
 | `adi-runtime/`、`adi-app/` | AGPL-3.0 | 改进必须回流 |
-| `adi-docs/` | CC BY 4.0 | 文档要能传播 |
+| `docs/` | CC BY 4.0 | 文档要能传播 |
 
 ## 参与
 

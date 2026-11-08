@@ -36,7 +36,7 @@ That constraint produces software with different properties:
 ├─────────────────────────────────────────────────────┤
 │  adi-sdk      Python / TypeScript client            │  licensed Apache-2.0
 ├─────────────────────────────────────────────────────┤
-│  adi-docs     documentation site (GitHub Pages)     │  CC BY 4.0
+│  docs     documentation site (GitHub Pages)     │  CC BY 4.0
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -63,7 +63,7 @@ a desktop shell, a phone app, a cron job, another agent.
 | `adi-sdk` | client for `/chat`, `/say`, `/proactive`, `/state` — working |
 | `adi-runtime` | fallback chains + say queue + proactive gate — working skeleton |
 | `adi-app` | macOS app that supervises the runtime — working, ad-hoc signed |
-| `adi-docs` | not published yet |
+| `docs` | not published yet |
 
 Measured on a 2021 MacBook Pro, macOS 27, local models only:
 
@@ -77,7 +77,7 @@ Measured on a 2021 MacBook Pro, macOS 27, local models only:
 |---|---|---|
 | `adi-sdk/` | Apache-2.0 | usable in commercial products |
 | `adi-runtime/`, `adi-app/` | AGPL-3.0 | improvements stay open |
-| `adi-docs/` | CC BY 4.0 | docs are meant to spread |
+| `docs/` | CC BY 4.0 | docs are meant to spread |
 
 `ADI` and the diamond mark are trademarks of the project. Forks are welcome; forks that ship
 as a competing hosted service are not.
