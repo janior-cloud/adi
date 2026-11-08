@@ -19,6 +19,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--port", type=int, default=8899)
     ap.add_argument("--provider", default="echo",
                     help="echo | command:<argv with {prompt}> | http:<url>")
+    ap.add_argument("--model", default="", help="model name for http providers")
+    ap.add_argument("--api-key", default="", help="bearer token for http providers (or $ADI_LOCAL_KEY)")
+    ap.add_argument("--preamble", default=(
+        "You are ADI, running on the user's own machine. Answers come from a model "
+        "server on this device; no network is required for you to answer. "
+        "Do not claim to be a cloud service."))
     ap.add_argument("--state", default="", help="JSON file whose contents /state returns")
     ap.add_argument("--data", default=str(Path.home() / ".adi"),
                     help="directory for the speech trail and proactive cooldown state")
@@ -29,7 +35,13 @@ def main(argv: list[str] | None = None) -> int:
         chain = Chain([command_provider("command", args.provider.split(":", 1)[1].split())])
     elif args.provider.startswith("http:"):
         from . import http_json_provider
-        chain = Chain([http_json_provider("http", args.provider.split(":", 1)[1])])
+        import os
+        key = args.api_key or os.environ.get("ADI_LOCAL_KEY") or os.environ.get("OPENAI_API_KEY") or None
+        chain = Chain([http_json_provider(
+            "http", args.provider.split(":", 1)[1], model=args.model or None, api_key=key,
+            extras={"max_tokens": 512,
+                    # reasoning models otherwise spend the whole budget thinking
+                    "chat_template_kwargs": {"enable_thinking": False}})])
     else:
         chain = Chain([echo_provider("[echo] ")])
 
@@ -50,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
         # Without a state file the cooldown never advances and every poll speaks.
         gate=ProactiveGate(state_file=data / "proactive.json"),
         state_provider=state,
+        preamble=args.preamble,
     ).serve(args.host, args.port)
     return 0
 

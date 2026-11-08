@@ -152,6 +152,12 @@ class HttpTests(unittest.TestCase):
         self.assertTrue(health["ok"])
         self.assertEqual(health["providers"], ["dead", "echo"])
 
+    def test_ui_is_served_at_root(self):
+        with urllib.request.urlopen(self.base + "/", timeout=10) as r:
+            self.assertEqual(r.status, 200)
+            self.assertIn("text/html", r.headers.get("Content-Type", ""))
+            self.assertIn("ADI", r.read().decode()[:500])
+
     def test_state_is_host_supplied(self):
         self.assertEqual(self.get("/state")["memory"]["sessions"], 2)
 

@@ -25,6 +25,7 @@ from urllib.parse import parse_qs, urlparse
 from .channels import SpeechQueue
 from .fallback import AllProvidersFailed, Chain
 from .proactive import ProactiveGate
+from .ui import PAGE
 
 CHUNK = 18  # characters per delta frame — small enough to feel live, big enough to stay cheap
 
@@ -32,13 +33,14 @@ CHUNK = 18  # characters per delta frame — small enough to feel live, big enou
 class Runtime:
     def __init__(self, chain: Chain, queue: SpeechQueue, gate: ProactiveGate,
                  state_provider: Callable[[], dict] | None = None,
-                 name: str = "adi", version: str = "0.1.0"):
+                 name: str = "adi", version: str = "0.1.0", preamble: str = ""):
         self.chain = chain
         self.queue = queue
         self.gate = gate
         self.state_provider = state_provider or (lambda: {})
         self.name = name
         self.version = version
+        self.preamble = preamble
         self.started = time.time()
 
     def health(self) -> dict:
@@ -47,7 +49,10 @@ class Runtime:
                 "providers": self.chain.names(), "queue_last_id": self.queue.last_id()}
 
     def chat(self, message: str) -> dict:
-        return self.chain.ask(message).as_dict()
+        # Without this a local model happily announces that it runs in a cloud
+        # data centre, because that is what its training data says agents do.
+        prompt = f"{self.preamble}\n\n{message}" if self.preamble else message
+        return self.chain.ask(prompt).as_dict()
 
     def chunks(self, text: str) -> list[str]:
         return [text[i:i + CHUNK] for i in range(0, len(text), CHUNK)] or [""]
@@ -95,6 +100,15 @@ class Runtime:
 
             def do_GET(self) -> None:  # noqa: N802 - BaseHTTPRequestHandler API
                 path = self._path()
+                if path in ("/", "/ui", "/index.html"):
+                    body = PAGE.encode()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
                 if path == "/health":
                     return self._send(200, runtime.health())
                 if path == "/state":
