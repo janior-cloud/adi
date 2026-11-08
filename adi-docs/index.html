@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADI — Agent–Device Interface</title>
+<meta name="description" content="Local-first runtime for agents that talk, see, and act on real devices. No cloud required.">
+<meta property="og:title" content="ADI — Agent–Device Interface">
+<meta property="og:description" content="Local-first runtime for agents that talk, see, and act on real devices. No cloud required.">
+<meta property="og:image" content="assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/adi-mark-128.png">
+<style>
+  :root{
+    --bg:#070b12; --card:#0d1622; --line:#1d3348; --line-soft:#152436;
+    --fg:#e8f1ff; --dim:#8fa6c4; --dimmer:#5e7593;
+    --accent:#3f8ecb; --accent-soft:#1b4a6b;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .glow{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(900px 500px at 50% -10%, rgba(63,142,203,.20), transparent 70%),
+      radial-gradient(700px 400px at 90% 20%, rgba(63,142,203,.07), transparent 70%);
+  }
+  main{position:relative; z-index:1; max-width:780px; margin:0 auto; padding:88px 28px 96px}
+  .brand{display:flex; align-items:center; gap:18px; margin-bottom:38px}
+  .brand img{width:72px; height:72px; border-radius:19px; box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  .brand h1{margin:0; font-size:30px; letter-spacing:.10em; font-weight:600}
+  .brand p{margin:4px 0 0; color:var(--dimmer); font-size:13px; letter-spacing:.14em; text-transform:uppercase}
+  h2{font-size:15px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);
+     margin:56px 0 18px; font-weight:600}
+  .lede{font-size:21px; line-height:1.55; margin:0 0 8px}
+  .lede b{color:#fff}
+  .sub{color:var(--dim); margin-top:14px}
+  .card{background:var(--card); border:1px solid var(--line-soft); border-radius:14px; padding:22px 24px}
+  pre{margin:0; overflow:auto; font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace; color:#cfe2f6}
+  pre .c{color:var(--dimmer)}
+  pre .k{color:#7fb8e8}
+  ol,ul{margin:0; padding-left:20px}
+  li{margin:9px 0}
+  li b{color:#fff}
+  table{width:100%; border-collapse:collapse; font-size:14px}
+  th,td{text-align:left; padding:11px 12px; border-bottom:1px solid var(--line-soft)}
+  th{color:var(--dim); font-weight:600; font-size:12px; letter-spacing:.1em; text-transform:uppercase}
+  tr:last-child td{border-bottom:0}
+  code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace; background:#101c2a; padding:2px 6px; border-radius:5px; color:#bcd6ee}
+  .ok{color:#6ecf9a}
+  .no{color:#e08a8a}
+  .pill{display:inline-block; font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+        color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:5px 12px; margin-right:8px}
+  footer{margin-top:72px; padding-top:26px; border-top:1px solid var(--line-soft); color:var(--dimmer); font-size:14px}
+  footer a{color:var(--accent); text-decoration:none}
+  footer a:hover{text-decoration:underline}
+  @media (max-width:560px){
+    main{padding:56px 20px 72px}
+    .brand img{width:56px;height:56px;border-radius:15px}
+    .lede{font-size:18px}
+    .brand h1{font-size:24px}
+  }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<main>
+
+  <div class="brand">
+    <img src="assets/adi-mark-256.png" alt="ADI">
+    <div>
+      <h1>ADI</h1>
+      <p>Agent–Device Interface</p>
+    </div>
+  </div>
+
+  <p class="lede">A runtime for agents that <b>talk, see, and act on real devices</b> — and keep working when the network doesn't.</p>
+  <p class="sub">Cloud is an optional accelerator, never the substrate. Every layer has a local fallback:
+  if the remote brain is gone, a local one answers; if the neural voice is gone, the system voice takes over. It never goes silent.</p>
+
+  <h2>Run it</h2>
+  <div class="card">
+<pre><span class="c"># the runtime listens on localhost; anything that can POST JSON can drive it</span>
+<span class="k">pip install</span> adi-sdk
+
+<span class="k">from</span> adi_sdk <span class="k">import</span> ADI
+
+adi = ADI()
+<span class="k">for</span> chunk <span class="k">in</span> adi.chat(<span style="color:#9ad1a8">"what changed on this machine today?"</span>):
+    print(chunk, end=<span style="color:#9ad1a8">""</span>, flush=True)
+
+adi.say(<span style="color:#9ad1a8">"backup finished"</span>)      <span class="c"># speak it, locally</span>
+adi.proactive()                  <span class="c"># None unless it has something worth saying</span></pre>
+  </div>
+
+  <h2>What "local-first" buys you</h2>
+  <table>
+    <tr><th>Layer</th><th>Cloud version</th><th>ADI</th></tr>
+    <tr><td>Brain</td><td class="no">request fails</td><td class="ok">local model answers</td></tr>
+    <tr><td>Voice</td><td class="no">402 / quota</td><td class="ok">system voice</td></tr>
+    <tr><td>Memory</td><td class="no">vendor database</td><td class="ok">a file on your disk</td></tr>
+    <tr><td>Proactivity</td><td class="no">engagement timers</td><td class="ok">gated by real state numbers</td></tr>
+  </table>
+
+  <h2>Four rules</h2>
+  <ol>
+    <li><b>No cloud required.</b> A cloud call is a performance decision, never a correctness dependency.</li>
+    <li><b>Every layer degradable.</b> Pull any plug; the system still answers.</li>
+    <li><b>Names are not identities.</b> Swap the model or the voice — who it is lives in memory and permissions.</li>
+    <li><b>Speak only when it changes your next action.</b> No evidence, no speech.</li>
+  </ol>
+
+  <h2>Licenses</h2>
+  <table>
+    <tr><th>Path</th><th>License</th><th>Why</th></tr>
+    <tr><td><code>adi-sdk/</code></td><td>Apache-2.0</td><td>usable in commercial products</td></tr>
+    <tr><td><code>adi-runtime/</code> <code>adi-app/</code></td><td>AGPL-3.0</td><td>improvements flow back</td></tr>
+    <tr><td><code>adi-docs/</code></td><td>CC BY 4.0</td><td>docs are meant to spread</td></tr>
+  </table>
+
+  <footer>
+    <span class="pill">pre-alpha</span>
+    <a href="https://github.com/janior-cloud/adi">github.com/janior-cloud/adi</a><br>
+    The most useful contribution right now is a fallback you can prove: pull a plug, show it still answers.
+  </footer>
+
+</main>
+</body>
+</html>
