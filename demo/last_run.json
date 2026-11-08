@@ -1,0 +1,88 @@
+{
+  "generated_at": "2026-11-08 16:43:45",
+  "local_model": "qwen36moe",
+  "total_secs": 4.2,
+  "steps": [
+    {
+      "kind": "boot",
+      "t": 0.18,
+      "text": "remote brain up on :9100",
+      "detail": "this stands in for a paid cloud endpoint; it is a separate process on a real socket"
+    },
+    {
+      "kind": "ready",
+      "t": 0.19,
+      "text": "runtime listening on :8899",
+      "detail": "chain: remote → local"
+    },
+    {
+      "kind": "ask",
+      "t": 1.06,
+      "question": "备份跑完了吗？",
+      "provider": "remote",
+      "degraded": false,
+      "attempts": [
+        {
+          "provider": "remote",
+          "ok": true,
+          "secs": 0.864
+        }
+      ],
+      "reply": "[remote] Heard you: “备份跑完了吗？”. The remote model answered — this path costs money and needs a network.",
+      "error": null,
+      "secs": 0.87
+    },
+    {
+      "kind": "cut",
+      "t": 1.06,
+      "text": "remote brain killed (pid 1233)",
+      "detail": "a real ECONNREFUSED on the next call — the same path as a dead cloud API"
+    },
+    {
+      "kind": "ask",
+      "t": 3.08,
+      "question": "网线拔了。你现在还在吗？",
+      "provider": "local",
+      "degraded": true,
+      "attempts": [
+        {
+          "provider": "remote",
+          "ok": false,
+          "error": "URLError: <urlopen error [Errno 61] Connection refused>",
+          "secs": 0.001
+        },
+        {
+          "provider": "local",
+          "ok": true,
+          "secs": 2.016
+        }
+      ],
+      "reply": "我在的。虽然你拔掉了网线，意味着你无法访问互联网，但我依然在这里作为一个人工智能助手存在。\n\n不过需要说明的是：\n\n1. **如果你指的是“你这边断网了”**：那我确实无法与你实时",
+      "error": null,
+      "secs": 2.02
+    },
+    {
+      "kind": "restore",
+      "t": 3.2,
+      "text": "remote brain back up",
+      "detail": "no restart of the runtime, no lost state"
+    },
+    {
+      "kind": "ask",
+      "t": 4.07,
+      "question": "网恢复了。刚才那句是谁答的？",
+      "provider": "remote",
+      "degraded": false,
+      "attempts": [
+        {
+          "provider": "remote",
+          "ok": true,
+          "secs": 0.868
+        }
+      ],
+      "reply": "[remote] Heard you: “网恢复了。刚才那句是谁答的？”. The remote model answered — this path costs money and needs a network.",
+      "error": null,
+      "secs": 0.87
+    }
+  ]
+}

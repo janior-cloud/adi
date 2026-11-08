@@ -54,6 +54,9 @@
   .no{color:#e08a8a}
   .pill{display:inline-block; font-size:12px; letter-spacing:.1em; text-transform:uppercase;
         color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:5px 12px; margin-right:8px}
+  .demo{margin:36px 0 0; border:1px solid var(--line-soft); border-radius:14px; overflow:hidden; background:#0a0f18}
+  .demo video{display:block; width:100%; height:auto}
+  .demo figcaption{padding:12px 18px; color:var(--dimmer); font-size:13px; line-height:1.6; border-top:1px solid var(--line-soft)}
   footer{margin-top:72px; padding-top:26px; border-top:1px solid var(--line-soft); color:var(--dimmer); font-size:14px}
   footer a{color:var(--accent); text-decoration:none}
   footer a:hover{text-decoration:underline}
@@ -80,6 +83,15 @@
   <p class="lede">A runtime for agents that <b>talk, see, and act on real devices</b> — and keep working when the network doesn't.</p>
   <p class="sub">Cloud is an optional accelerator, never the substrate. Every layer has a local fallback:
   if the remote brain is gone, a local one answers; if the neural voice is gone, the system voice takes over. It never goes silent.</p>
+
+  <figure class="demo">
+    <video src="assets/demo.mp4" poster="assets/demo-poster.png" autoplay loop muted playsinline
+           aria-label="Recorded terminal session: the remote provider is killed, the local provider answers"></video>
+    <figcaption><b style="color:var(--dim)">The network is optional.</b> Real run, one machine: the remote provider
+    is a separate process on a real socket and is terminated mid-session &mdash; not a flag, not a mock.
+    The next question is answered by the local model in 2.0s with <code>degraded: true</code>, and
+    nothing is lost when the remote comes back. <span style="color:var(--dimmer)">18s, 3 questions.</span></figcaption>
+  </figure>
 
   <h2>Run it</h2>
   <div class="card">

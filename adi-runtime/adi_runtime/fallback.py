@@ -131,25 +131,35 @@ def command_provider(name: str, argv: list[str], *, cwd: str | None = None,
 
 
 def http_json_provider(name: str, url: str, *, model: str | None = None,
-                       api_key: str | None = None, timeout_s: float = 120.0) -> Provider:
+                       api_key: str | None = None, timeout_s: float = 120.0,
+                       extras: dict | None = None) -> Provider:
     """Call an OpenAI-compatible /chat/completions endpoint over plain urllib.
 
     No SDK dependency on purpose: this is the "remote accelerator" slot, and it
     must stay the easiest thing in the system to delete.
+
+    `extras` is merged into the request body — that is how a local llama.cpp
+    server gets `chat_template_kwargs: {"enable_thinking": false}`, without which
+    a reasoning model can spend the whole token budget thinking and answer with
+    an empty string.
     """
     import json
     import urllib.request
+
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
     def call(prompt: str) -> str:
         payload: dict = {"messages": [{"role": "user", "content": prompt}]}
         if model:
             payload["model"] = model
+        if extras:
+            payload.update(extras)
         headers = {"Content-Type": "application/json"}
         if api_key:
             headers["Authorization"] = f"Bearer {api_key}"
         req = urllib.request.Request(url, data=json.dumps(payload).encode(),
                                      headers=headers, method="POST")
-        with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+        with opener.open(req, timeout=timeout_s) as resp:
             data = json.loads(resp.read() or b"{}")
         return ((data.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
 
