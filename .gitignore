@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+._*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.next/
+
+# Build output
+build/
+*.app/
+*.dmg
+*.icns
+
+# Local state that must never be published
+state/
+*.wav
+*.onnx
+*.onnx.json
+*.bin
+*.db
+.env
+.env.*
