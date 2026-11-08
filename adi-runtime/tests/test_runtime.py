@@ -91,11 +91,18 @@ class GateTests(unittest.TestCase):
         self.assertIsNone(text)
         self.assertEqual(reason, "no_facts")
 
-    def test_line_cites_a_real_number(self):
-        text, reason = ProactiveGate(cooldown_s=0).next_line(self.state())
-        self.assertIsNotNone(text)
-        self.assertIn(reason, {"failed_tasks", "open_tasks", "providers", "memory_scale", "idle"})
-        self.assertTrue(any(ch.isdigit() for ch in text) or reason == "idle")
+    def test_line_is_deterministic_and_ordered(self):
+        gate = ProactiveGate(cooldown_s=0)
+        lines = [gate.next_line(self.state()) for _ in range(5)]
+        self.assertEqual([r for _, r in lines][:2], ["failed_tasks", "open_tasks"],
+                         "highest-signal candidate must come first")
+        self.assertTrue(all(t for t, _ in lines))
+
+    def test_numeric_candidates_cite_a_number(self):
+        gate = ProactiveGate(cooldown_s=0)
+        for text, reason in gate.candidates(gate.facts(self.state())):
+            if reason in ("failed_tasks", "open_tasks", "memory_scale"):
+                self.assertTrue(any(ch.isdigit() for ch in text), f"{reason} lost its number")
 
     def test_cooldown_silences(self):
         gate = ProactiveGate(cooldown_s=600, clock=lambda: 1000.0)

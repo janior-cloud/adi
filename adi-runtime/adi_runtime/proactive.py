@@ -35,6 +35,7 @@ class ProactiveGate:
         self.cooldown_s = cooldown_s
         self.templates = {**DEFAULT_TEMPLATES, **(templates or {})}
         self._clock = clock
+        self._rotation = 0
 
     # ---- facts ----
 
@@ -115,8 +116,10 @@ class ProactiveGate:
         options = self.candidates(facts)
         if not options:
             return None, "no_facts"
-        # Rotate through the candidates so the same sentence does not repeat
-        # every cooldown window, without needing any randomness.
-        text, reason = options[int(now // max(self.cooldown_s, 1)) % len(options)]
+        # Rotate deterministically: the same sequence of calls always produces
+        # the same order. Keying this off the clock made tests flaky and made a
+        # restart jump the rotation for no reason.
+        text, reason = options[self._rotation % len(options)]
+        self._rotation = (self._rotation + 1) % len(options)
         self._record(text, reason)
         return text, reason

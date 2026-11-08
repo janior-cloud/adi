@@ -3,7 +3,7 @@
 The server half of ADI: a localhost HTTP + SSE surface, three degradation primitives,
 and no dependencies outside the Python standard library.
 
-**Status: working.** `python -m unittest discover -s tests` → 17 tests, all passing.
+**Status: working.** `python -m unittest discover -s tests` → 18 tests, all passing (3.10+; also runs on 3.9).
 Smoke-tested end to end against `adi-sdk`.
 
 ## Run it
